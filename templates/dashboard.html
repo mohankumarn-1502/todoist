@@ -1,64 +1,94 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
-    <title>Dashboard</title>
+    <title>Todoist</title>
+    <!-- favicon -->
+    <link rel="icon" type="image/png" href="{% static 'assets/todoist.png' %}">
+
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
+
 <body class="bg-gray-100 min-h-screen flex justify-center pt-10">
 
-<div class="w-[65%]  bg-white rounded-lg shadow overflow-hidden m-10">
+    <div class="w-[65%]  bg-white rounded-lg shadow overflow-hidden m-10">
 
-    <!-- Header -->
-    <div class="bg-gradient-to-r from-pink-400 to-red-400 p-5 text-white relative">
-        <a href='logout' class="absolute top-4 right-4 text-xl hover:text-2xl">Logout</a>
-        <h2 class="text-3xl">Hello <span class="hover:text-4xl">{{ request.user.username }}</span>,</h2>
-        <p class="text-xl">You have {{ todos|length }} incomplete task{{ todos|length|pluralize }}</p>
-    </div>
+        <!-- Header -->
+        <div class="bg-gradient-to-r from-pink-400 to-red-400 p-5 text-white relative">
+    
+            <a href='logout' class="absolute top-4 right-4 text-xl hover:text-2xl">Logout</a>
+            <h2 class="text-3xl">Hello  {{ request.user.username }} ,</h2>
+            <p class="text-xl">You have <span class="text-2xl">{{ todos|length }} </span> incomplete task{{ todos|length|pluralize }}</p>
 
-    <!-- Search + Add -->
-    <div class="flex items-center justify-between px-6  py-3 border-b">
-        <div class="flex items-center gap-2 ">
-            <form method="GET" class="flex w-full gap-2">
-                <input type="text" name="q" placeholder="ex" class="border rounded px-9 focus:outline-none focus:ring-1 focus:ring-red-400 py-2 w-full">
-                <button class="border px-4 rounded text-red-400 border-red-400 hover:bg-red-400 hover:text-white transition">Search</button>
-            </form>
-         </div>
-        <a href='add' class="text-5xl text-red-400  px-2">+</a>
-     </div>
-     <!-- Todo List -->
-    <ul class="divide-y">
-        {% for todo in todos %}
+            <!-- Progress Bar -->
+            <div class="mt-4">
+                <div class="flex justify-between mb-1">
+                    <span class="text-lg font-medium text-white">Progress</span>
+                    <span class="text-lg font-medium text-white">{{ progress_percentage }}%</span>
+                </div>
+                <div class="w-full bg-red-200 rounded-full h-7">
+                    <div class="bg-white h-7 rounded-full transition-all duration-500"style="width: {{ progress_percentage }}%"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Search + Add -->
+        <div class="flex items-center justify-between px-6  py-3 border-b">
+            <div class="flex items-center gap-2 ">
+                <form method="GET" class="flex w-full gap-2">
+                    <input type="text" name="q" placeholder="ex"
+                        class="border rounded px-9 focus:outline-none focus:ring-1 focus:ring-red-400 py-2 w-full">
+                    <button
+                        class="border px-4 rounded text-red-400 border-red-400 hover:bg-red-400 hover:text-white transition">Search</button>
+                </form>
+            </div>
+            <a href='add' class="text-5xl text-red-400  px-2 flex items-center justify-center hover:text-red-600">+</a>
+        </div>
+        <!-- Todo List -->
+        <ul class="divide-y">
+            {% for todo in todos %}
             <li class="flex items-center justify-between text-2xl p-4">
-            <div class="flex items-center gap-3 cursor-pointer" onclick="toggleTodo(this)">
-                <!-- Fake checkbox -->
-                <span   class="w-4 h-4 rounded-full border-2 border-red-400 flex items-center justify-center"><span class="w-2 h-2 rounded-full bg-red-400 hidden"></span></span>
-                <!-- Todo text -->
-                <span class="todo-text"> {{ todo.title }}</span>
-            </div>
-            <div class="flex gap-3 items-center">
-                <!-- EDIT -->
-                <a href='/edit/{{ todo.id }}/'class="text-blue-500 text-xl font-semibold hover:text-2xl">Edit</a>
-                <!-- DELETE -->
-                <a href='/delete/{{ todo.id }}/' onclick="return confirm('DELETE TODO LIST : {{  todo.title }} ?')" class="text-red-500 text-xl font-bold hover:text-2xl">X</a>
-            </div>
+                <!-- Toggle Link -->
+                <a href="{% url 'toggle_todo' todo.id %}" class="flex items-center gap-3 cursor-pointer">
+                    <!-- Checkbox -->
+                    <span
+                        class="w-6 h-6 rounded-full border-2 border-red-600 flex items-center justify-center transition-colors {% if todo.is_completed %}bg-red-500{% endif %}">
+                        {% if todo.is_completed %}
+                        <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        {% endif %}
+                    </span>
+                    <!-- Todo text -->
+                    <span
+                        class="todo-text {% if todo.is_completed %}line-through text-gray-500{% else %}text-red-500{% endif %}">
+                        {{ todo.title }} </span>
+                </a>
+
+                <div class="flex gap-3 items-center">
+                    <!-- EDIT -->
+                    <a href='/edit/{{ todo.id }}/'
+                        class="text-blue-600 text-xl font-semibold hover:underline hover:text-blue-800">Edit</a>
+                    <!-- DELETE -->
+                    <a href='/delete/{{ todo.id }}/' onclick="return confirm('DELETE TODO LIST : {{  todo.title }} ?')"
+                        class="text-red-400 text-xl font-bold hover:text-red-600 ">X</a>
+                </div>
             </li>
-        {% empty %}
-        <li class="p-4 text-center text-gray-400">No tasks</li>
-        {% endfor %}
-    </ul>
-</div>
-<script>
-function toggleTodo(el) {
-    const text = el.querySelector('.todo-text');
-    const dot = el.querySelector('span span');
-
-    text.classList.toggle('line-through');
-    text.classList.toggle('text-gray-400');
-
-    dot.classList.toggle('hidden');
-}
-</script>
+            {% empty %}
+            <li class="p-4 text-center text-gray-400">No tasks</li>
+            {% endfor %}
+        </ul>
+    </div>
+    <script>
+        function toggleTodo(el) {
+            const text = el.querySelector('.todo-text');
+            const dot = el.querySelector('span span');
+            text.classList.toggle('line-through');
+            text.classList.toggle('text-gray-500');
+            dot.classList.toggle('hidden');
+        }
+    </script>
 
 </body>
+
 </html>

@@ -15,7 +15,7 @@ def login_view(request):
             login(request, user)
             return redirect('dashboard')
         else:
-            return redirect('register')
+            return render(request, "login.html", {"error": "Invalid Username or Password"})
     return render(request, 'login.html')
 
 # REGISTER VIEW
@@ -38,20 +38,36 @@ def register_view(request):
     return render(request, "register.html")
 
 
-# DASHBOARD
-def dashboard(request):
-    if request.method == "POST":
-        title = request.POST['title']
-        Todo.objects.create(user=request.user, title=title)
-    todos = Todo.objects.filter(user=request.user)
-    return render(request, 'dashboard.html', {'todos': todos})
-
-
 @login_required
 def dashboard(request):
     q = request.GET.get("q", "") 
     todos = Todo.objects.filter(user=request.user, title__icontains=q)
-    return render(request, "dashboard.html", {"todos": todos})
+
+    # Calculate Progress
+    total_count = todos.count()
+    completed_count = todos.filter(is_completed=True).count()
+    
+    if total_count > 0:
+        progress_percentage = int((completed_count / total_count) * 100)
+    else:
+        progress_percentage = 0
+
+    context = {
+        "todos": todos,
+        "completed_count": completed_count,
+        "total_count": total_count,
+        "progress_percentage": progress_percentage,
+    }
+    
+    return render(request, "dashboard.html", context)
+
+
+@login_required
+def toggle_todo(request, id):
+    todo = get_object_or_404(Todo, id=id, user=request.user)
+    todo.is_completed = not todo.is_completed
+    todo.save()
+    return redirect("dashboard")
 
 
 @login_required
