@@ -11,67 +11,75 @@
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
-<body class="bg-gray-100 min-h-screen flex justify-center pt-10">
+<body class="bg-gray-100 min-h-screen flex justify-center py-4 px-4 md:px-20 lg:px-40">
 
-    <div class="w-[65%]  bg-white rounded-lg shadow overflow-hidden m-10">
+    <div class="w-full md:w-3/4 lg:w-2/3 xl:w-1/2 bg-white rounded-lg shadow overflow-hidden my-4 md:m-10">
 
         <!-- Header -->
-        <div class="bg-gradient-to-r from-pink-400 to-red-400 p-5 text-white relative">
-    
-            <a href='logout' class="absolute top-4 right-4 text-xl hover:text-2xl">Logout</a>
-            <h2 class="text-3xl">Hello  {{ request.user.username }} ,</h2>
-            <p class="text-xl">You have <span class="text-2xl">{{ todos|length }} </span> incomplete task{{ todos|length|pluralize }}</p>
+        <div class="bg-gradient-to-r from-pink-400 to-red-400 p-3 md:p-5 text-white relative">
+
+            <a href='logout'
+                class="absolute top-3 right-3 md:top-4 md:right-4 text-lg md:text-xl hover:text-2xl">Logout</a>
+            <h2 class="text-2xl md:text-3xl font-semibold">Hello {{ request.user.username }},</h2>
+            <p class="text-sm md:text-xl">You have <span class="text-lg md:text-2xl">{{ todos|length }} </span>
+                incomplete task{{ todos|length|pluralize }}</p>
 
             <!-- Progress Bar -->
-            <div class="mt-4">
+            <div class="mt-2 md:mt-4">
                 <div class="flex justify-between mb-1">
-                    <span class="text-lg font-medium text-white">Progress</span>
-                    <span class="text-lg font-medium text-white">{{ progress_percentage }}%</span>
+                    <span class="text-sm md:text-lg font-medium text-white">Progress</span>
+                    <span class="text-sm md:text-lg font-medium text-white">{{ progress_percentage }}%</span>
                 </div>
-                <div class="w-full bg-red-200 rounded-full h-7">
-                    <div class="bg-white h-7 rounded-full transition-all duration-500"style="width: {{ progress_percentage }}%"></div>
+                <div class="w-full bg-red-200 rounded-full h-2.5 md:h-7">
+                    <div class="bg-white h-2.5 md:h-7 rounded-full transition-all duration-500"
+                        style="width: {{ progress_percentage }}%"></div>
                 </div>
             </div>
         </div>
 
         <!-- Search + Add -->
-        <div class="flex items-center justify-between px-6  py-3 border-b">
-            <div class="flex items-center gap-2 ">
+        <div class="flex items-center justify-between px-4 md:px-6 py-3 border-b">
+            <div class="flex items-center gap-2 w-full mr-2">
                 <form method="GET" class="flex w-full gap-2">
-                    <input type="text" name="q" placeholder="ex"
-                        class="border rounded px-9 focus:outline-none focus:ring-1 focus:ring-red-400 py-2 w-full">
+                    <input type="text" name="q" placeholder="Search..."
+                        class="border rounded px-3 md:px-4 py-2 w-full focus:outline-none focus:ring-1 focus:ring-red-400">
                     <button
-                        class="border px-4 rounded text-red-400 border-red-400 hover:bg-red-400 hover:text-white transition">Search</button>
+                        class="border px-3 md:px-4 py-2 rounded text-red-400 border-red-400 hover:bg-red-400 hover:text-white transition">Search</button>
                 </form>
             </div>
-            <a href='add' class="text-5xl text-red-400  px-2 flex items-center justify-center hover:text-red-600">+</a>
+            <a href='add'
+                class="text-4xl md:text-5xl text-red-400 px-2 flex items-center justify-center hover:text-red-600">+</a>
         </div>
         <!-- Todo List -->
         <ul class="divide-y">
             {% for todo in todos %}
-            <li class="flex items-center justify-between text-2xl p-4">
+            <li class="flex flex-col sm:flex-row sm:items-center justify-between p-3 md:p-4 gap-3">
                 <!-- Toggle Link -->
-                <a href="{% url 'toggle_todo' todo.id %}" class="flex items-center gap-3 cursor-pointer">
+                <a href="{% url 'toggle_todo' todo.id %}"
+                    class="flex items-center gap-3 cursor-pointer w-full sm:w-auto">
                     <!-- Checkbox -->
                     <span
-                        class="w-6 h-6 rounded-full border-2 border-red-600 flex items-center justify-center transition-colors {% if todo.is_completed %}bg-red-500{% endif %}">
+                        class="flex-shrink-0 w-6 h-6 rounded-full border-2 border-red-600 flex items-center justify-center transition-colors {% if todo.is_completed %}bg-red-500{% endif %}">
                         {% if todo.is_completed %}
-                        <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7">
+                            </path>
+                        </svg>
                         {% endif %}
                     </span>
                     <!-- Todo text -->
                     <span
-                        class="todo-text {% if todo.is_completed %}line-through text-gray-500{% else %}text-red-500{% endif %}">
+                        class="todo-text text-lg md:text-2xl break-all {% if todo.is_completed %}line-through text-gray-500{% else %}text-red-500{% endif %}">
                         {{ todo.title }} </span>
                 </a>
 
-                <div class="flex gap-3 items-center">
+                <div class="flex gap-3 items-center justify-end sm:justify-start pl-9 sm:pl-0">
                     <!-- EDIT -->
                     <a href='/edit/{{ todo.id }}/'
-                        class="text-blue-600 text-xl font-semibold hover:underline hover:text-blue-800">Edit</a>
+                        class="text-blue-600 text-base md:text-xl font-semibold hover:underline hover:text-blue-800">Edit</a>
                     <!-- DELETE -->
                     <a href='/delete/{{ todo.id }}/' onclick="return confirm('DELETE TODO LIST : {{  todo.title }} ?')"
-                        class="text-red-400 text-xl font-bold hover:text-red-600 ">X</a>
+                        class="text-red-400 text-base md:text-xl font-bold hover:text-red-600 ">X</a>
                 </div>
             </li>
             {% empty %}
