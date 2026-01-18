@@ -6,7 +6,7 @@
     <meta charset="UTF-8">
     <title>Todoist</title>
     <!-- favicon -->
-    <link rel="icon" type="image/png" href="{% static 'assets/todoist.png' %}">
+    <link rel="icon" type="image/png" href="{{ https://ik.imagekit.io/9jskk4vct8/cashcraft/todoist.png }}">
 
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
@@ -68,9 +68,7 @@
                         {% endif %}
                     </span>
                     <!-- Todo text -->
-                    <span
-                        class="todo-text text-lg md:text-2xl break-all {% if todo.is_completed %}line-through text-gray-500{% else %}text-red-500{% endif %}">
-                        {{ todo.title }} </span>
+                    <span class="todo-text text-lg md:text-2xl break-all {% if todo.is_completed %}line-through text-gray-500{% else %}text-red-500{% endif %}"> {{ todo.title }} </span>
                 </a>
 
                 <div class="flex gap-3 items-center justify-end sm:justify-start pl-9 sm:pl-0">
